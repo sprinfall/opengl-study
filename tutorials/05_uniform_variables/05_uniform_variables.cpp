@@ -4,8 +4,8 @@
 #include <GL/glew.h>
 #include <GL/freeglut.h>
 
-#include "ogldev_util.h"
 #include "ogldev_math_3d.h"
+#include "ogldev_util.h"
 
 GLuint g_vbo;
 GLuint g_scale_location;
@@ -20,6 +20,9 @@ static void RenderSceneCB() {
 
   scale += 0.001f;
 
+  // 设置新的值到一致变量。
+  // 注意，此例没有通过 glGetUniform 去拿一致变量的值，应该这个值我们存在了静态
+  // 变量中。
   glUniform1f(g_scale_location, sinf(scale));
 
   glEnableVertexAttribArray(0);
@@ -105,7 +108,7 @@ static void CompileShaders() {
   glLinkProgram(shader_program);
 
   glGetProgramiv(shader_program, GL_LINK_STATUS, &status);
-  if (status == 0) {
+  if (status != GL_TRUE) {
     glGetProgramInfoLog(shader_program, sizeof(error_log), NULL, error_log);
     fprintf(stderr, "Error linking shader program: '%s'\n", error_log);
     exit(1);
@@ -114,7 +117,7 @@ static void CompileShaders() {
   glValidateProgram(shader_program);
 
   glGetProgramiv(shader_program, GL_VALIDATE_STATUS, &status);
-  if (status) {
+  if (status != GL_TRUE) {
     glGetProgramInfoLog(shader_program, sizeof(error_log), NULL, error_log);
     fprintf(stderr, "Invalid shader program: '%s'\n", error_log);
     exit(1);
@@ -122,6 +125,8 @@ static void CompileShaders() {
 
   glUseProgram(shader_program);
 
+  // 拿到一致变量的位置（且只有在链接之后才能拿到这个位置），随后便可通过
+  // glUniform 设置一致变量的值，或通过 glGetUniform 得到它的值。
   g_scale_location = glGetUniformLocation(shader_program, "gScale");
   assert(g_scale_location != 0xFFFFFFFF);
 }
@@ -129,7 +134,6 @@ static void CompileShaders() {
 int main(int argc, char** argv) {
   glutInitContextVersion(4, 5);
   glutInitContextProfile(GLUT_CORE_PROFILE);
-  // glutInitContextFlags(GLUT_FORWARD_COMPATIBLE);
 
   glutInit(&argc, argv);
   glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA);

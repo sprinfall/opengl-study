@@ -7,11 +7,6 @@
 #include "ogldev_util.h"
 #include "ogldev_math_3d.h"
 
-GLuint g_vbo;
-
-const char* kVSFileName = "shader.vs";  // Vertex shader
-const char* kFSFileName = "shader.fs";  // Fragment shader
-
 static const char* DescribeError(GLenum gl_error) {
   switch (gl_error) {
     case GL_INVALID_ENUM:
@@ -35,6 +30,11 @@ static void CheckError() {
     printf("GL error: %s\n", DescribeError(gl_error));
   }
 }
+
+GLuint g_vbo;
+
+const char* kVSFileName = "shader.vs";  // Vertex shader
+const char* kFSFileName = "shader.fs";  // Fragment shader
 
 static void RenderSceneCB() {
   glClear(GL_COLOR_BUFFER_BIT);
@@ -72,8 +72,8 @@ static void AddShader(GLuint shader_program, const char* shader_text,
 
   // 在 编译 shader 之前，指定它的 source。
   // Shader 的 source 可以分布于多个字符数组。
-  const GLchar* texts[1] = { shader_text };
-  GLint lengths[1] = { (GLint)std::strlen(shader_text) };
+  const GLchar* texts[1] = {shader_text};
+  GLint lengths[1] = {(GLint)std::strlen(shader_text)};
   // 原本是 C 风格的写法：
   // GLint lengths[1];
   // lengths[0] = strlen(shader_text)  // 注意：并没有 size_t -> int 的警告！
@@ -153,18 +153,18 @@ static void CompileShaders() {
 }
 
 int main(int argc, char** argv) {
-  // Request a core profile context, otherwise we will be stuck to GL-3.0.
-  // See: https://stackoverflow.com/a/40573748
+  // 请求 core profile context，否则缺省只能使用 GL-3.0。
+  // 详见：https://stackoverflow.com/a/40573748
   glutInitContextVersion(4, 5);
   glutInitContextProfile(GLUT_CORE_PROFILE);
   // glutInitContextFlags(GLUT_FORWARD_COMPATIBLE);
 
   glutInit(&argc, argv);
-  glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA);  // TODO: Why not RGBA?
+  glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA);
 
   glutInitWindowSize(1024, 768);
   glutInitWindowPosition(100, 100);
-  glutCreateWindow("Tutorial 04 - Shaders");
+  glutCreateWindow("04 - Shaders");
 
   glutDisplayFunc(RenderSceneCB);
 

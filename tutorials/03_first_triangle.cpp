@@ -1,9 +1,11 @@
-#include <stdio.h>
+#include <cstdio>
 
 #include <GL/glew.h>
 #include <GL/freeglut.h>
 
 #include "ogldev_math_3d.h"
+
+// ISSUE: 并没有白色背景的三角显示出来。
 
 GLuint g_vbo;
 
@@ -14,21 +16,18 @@ static void RenderSceneCB() {
   glBindBuffer(GL_ARRAY_BUFFER, g_vbo);
   glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
 
-  // glDrawArrays(GL_TRIANGLES, 0, 3);
-  glDrawArrays(GL_POINTS, 0, 1);
+  glDrawArrays(GL_TRIANGLES, 0, 3);
 
   glDisableVertexAttribArray(0);
 
   glutSwapBuffers();
-
-  // glFlush();
 }
 
 static void CreateVertexBuffer() {
-  Vector3f vertices[1];
-  vertices[0] = Vector3f(-0.5f, -1.0f, 0.0f);
-  // vertices[1] = Vector3f(1.0f, -1.0f, 0.0f);
-  // vertices[2] = Vector3f(0.0f, 1.0f, 0.0f);
+  Vector3f vertices[3];
+  vertices[0] = Vector3f(-1.0f, -1.0f, 0.0f);
+  vertices[1] = Vector3f(1.0f, -1.0f, 0.0f);
+  vertices[2] = Vector3f(0.0f, 1.0f, 0.0f);
 
   glGenBuffers(1, &g_vbo);
   glBindBuffer(GL_ARRAY_BUFFER, g_vbo);
@@ -36,12 +35,15 @@ static void CreateVertexBuffer() {
 }
 
 int main(int argc, char** argv) {
+  // glutInitContextVersion(4, 5);
+  // glutInitContextProfile(GLUT_CORE_PROFILE);
+
   glutInit(&argc, argv);
   glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA);
 
   glutInitWindowSize(1024, 768);
   glutInitWindowPosition(100, 100);
-  glutCreateWindow("Tutorial 03 - First Triangle");
+  glutCreateWindow("03 - First Triangle");
 
   glutDisplayFunc(RenderSceneCB);
 
@@ -52,7 +54,13 @@ int main(int argc, char** argv) {
     return 1;
   }
 
+  printf("GL version: %s\n", glGetString(GL_VERSION));
+
   glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+
+  // GLuint vao;
+  // glGenVertexArrays(1, &vao);
+  // glBindVertexArray(vao);
 
   CreateVertexBuffer();
 
