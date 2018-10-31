@@ -1,14 +1,15 @@
+#include <cmath>
 #include <cstdio>
 #include <string>
 
 #include <GL/glew.h>
 #include <GL/freeglut.h>
 
-#include "ogldev_math_3d.h"
 #include "ogldev_util.h"
+#include "ogldev_math_3d.h"
 
 GLuint g_vbo;
-GLuint g_scale_location;
+GLuint g_world_location;
 
 const char* kVSFileName = "shader.vs";
 const char* kFSFileName = "shader.fs";
@@ -20,10 +21,20 @@ static void RenderSceneCB() {
 
   scale += 0.001f;
 
-  // 为一致变量设置新的值。
-  // 注意，此例没有通过 glGetUniform 去拿一致变量的值，因为这个值我们存在了静态
-  // 变量中。
-  glUniform1f(g_scale_location, sinf(scale));
+  // Matrix4f.m : float m[4][4]
+  Matrix4f world;
+
+  world.InitIdentity();
+  world.m[0][3] = sinf(scale);
+  // 原来的写法为（太复杂了）：
+  // world.m[0][0] = 1.0f; world.m[0][1] = 0.0f; world.m[0][2] = 0.0f; world.m[0][3] = sinf(scale);
+  // world.m[1][0] = 0.0f; world.m[1][1] = 1.0f; world.m[1][2] = 0.0f; world.m[1][3] = 0.0f;
+  // world.m[2][0] = 0.0f; world.m[2][1] = 0.0f; world.m[2][2] = 1.0f; world.m[2][3] = 0.0f;
+  // world.m[3][0] = 0.0f; world.m[3][1] = 0.0f; world.m[3][2] = 0.0f; world.m[3][3] = 1.0f;
+
+  // 把 matrix 传给 shader。
+  // 注意最后一个参数不能直接写成 world.m，因为它的类型是 float (*)[4]。
+  glUniformMatrix4fv(g_world_location, 1, GL_TRUE, &world.m[0][0]);
 
   glEnableVertexAttribArray(0);
   glBindBuffer(GL_ARRAY_BUFFER, g_vbo);
@@ -127,8 +138,8 @@ static void CompileShaders() {
 
   // 拿到一致变量的位置（且只有在链接之后才能拿到这个位置），随后便可通过
   // glUniform 设置一致变量的值，或通过 glGetUniform 得到它的值。
-  g_scale_location = glGetUniformLocation(shader_program, "gScale");
-  assert(g_scale_location != 0xFFFFFFFF);
+  g_world_location = glGetUniformLocation(shader_program, "gWorld");
+  assert(g_world_location != 0xFFFFFFFF);
 }
 
 int main(int argc, char** argv) {
@@ -140,7 +151,7 @@ int main(int argc, char** argv) {
 
   glutInitWindowSize(1024, 768);
   glutInitWindowPosition(100, 100);
-  glutCreateWindow("05 - Uniform Variables");
+  glutCreateWindow("06 - Translation Transform");
 
   InitializeGlutCallbacks();
 

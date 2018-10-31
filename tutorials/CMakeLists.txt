@@ -13,3 +13,4 @@ endforeach()
 
 add_subdirectory(04_shaders)
 add_subdirectory(05_uniform_variables)
+add_subdirectory(06_transform)
