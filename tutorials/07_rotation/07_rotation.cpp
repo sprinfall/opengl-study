@@ -8,6 +8,8 @@
 #include "ogldev_math_3d.h"
 #include "utility.h"
 
+// 这个例子与 06_translation 几乎一样，除了矩阵不同。
+
 GLuint g_vbo;
 GLuint g_world_location;
 
@@ -21,13 +23,13 @@ static void RenderSceneCB() {
   // Matrix4f.m : float m[4][4]
   Matrix4f world;
 
-  world.InitIdentity();
-  world.m[0][3] = sinf(scale);
-  // 原来的写法为（太复杂了）：
-  // world.m[0][0] = 1.0f; world.m[0][1] = 0.0f; world.m[0][2] = 0.0f; world.m[0][3] = sinf(scale);
-  // world.m[1][0] = 0.0f; world.m[1][1] = 1.0f; world.m[1][2] = 0.0f; world.m[1][3] = 0.0f;
-  // world.m[2][0] = 0.0f; world.m[2][1] = 0.0f; world.m[2][2] = 1.0f; world.m[2][3] = 0.0f;
-  // world.m[3][0] = 0.0f; world.m[3][1] = 0.0f; world.m[3][2] = 0.0f; world.m[3][3] = 1.0f;
+  // 绕着 Z 轴旋转，注意 InitRotateTransform() 的参数为 radian 角度。
+  world.InitRotateTransform(0.0f, 0.0f, ToDegree(scale));
+  // 原来的写法：
+  // world.m[0][0]=cosf(scale); world.m[0][1]=-sinf(scale); world.m[0][2]=0.0f; world.m[0][3]=0.0f;
+  // world.m[1][0]=sinf(scale); world.m[1][1]=cosf(scale);  world.m[1][2]=0.0f; world.m[1][3]=0.0f;
+  // world.m[2][0]=0.0f;        world.m[2][1]=0.0f;         world.m[2][2]=1.0f; world.m[2][3]=0.0f;
+  // world.m[3][0]=0.0f;        world.m[3][1]=0.0f;         world.m[3][2]=0.0f; world.m[3][3]=1.0f;
 
   // 把 matrix 传给 shader。
   // 注意最后一个参数不能直接写成 world.m，因为它的类型是 float (*)[4]。

@@ -1,7 +1,7 @@
-set(TARGET_NAME 06_transform)
+set(TARGET_NAME 07_rotation)
 
 add_executable(${TARGET_NAME}
-    06_transform.cpp
+    07_rotation.cpp
     ../utility.cpp
     ../utility.h)
 
