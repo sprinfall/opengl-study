@@ -28,8 +28,9 @@ if(GLEW_FOUND)
     message(STATUS ${GLEW_LIBRARIES})
 endif()
 
-# include_directories(${PROJECT_SOURCE_DIR})
+include_directories(${PROJECT_SOURCE_DIR})
 include_directories(${PROJECT_SOURCE_DIR}/common)
+include_directories(${PROJECT_SOURCE_DIR}/tutorials)
 
 add_subdirectory(common)
 add_subdirectory(tutorials)

@@ -5,8 +5,6 @@
 
 #include "ogldev_math_3d.h"
 
-// ISSUE: 并没有白色背景的三角显示出来。
-
 GLuint g_vbo;
 
 static void RenderSceneCB() {
@@ -23,6 +21,10 @@ static void RenderSceneCB() {
   glutSwapBuffers();
 }
 
+static void InitializeGlutCallbacks() {
+  glutDisplayFunc(RenderSceneCB);
+}
+
 static void CreateVertexBuffer() {
   Vector3f vertices[3];
   vertices[0] = Vector3f(-1.0f, -1.0f, 0.0f);
@@ -35,9 +37,6 @@ static void CreateVertexBuffer() {
 }
 
 int main(int argc, char** argv) {
-  // glutInitContextVersion(4, 5);
-  // glutInitContextProfile(GLUT_CORE_PROFILE);
-
   glutInit(&argc, argv);
   glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA);
 
@@ -45,7 +44,7 @@ int main(int argc, char** argv) {
   glutInitWindowPosition(100, 100);
   glutCreateWindow("03 - First Triangle");
 
-  glutDisplayFunc(RenderSceneCB);
+  InitializeGlutCallbacks();
 
   // Must be done after glut is initialized!
   GLenum res = glewInit();
@@ -57,10 +56,6 @@ int main(int argc, char** argv) {
   printf("GL version: %s\n", glGetString(GL_VERSION));
 
   glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
-
-  // GLuint vao;
-  // glGenVertexArrays(1, &vao);
-  // glBindVertexArray(vao);
 
   CreateVertexBuffer();
 

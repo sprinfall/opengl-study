@@ -5,13 +5,10 @@
 #include <GL/freeglut.h>
 
 #include "ogldev_math_3d.h"
-#include "ogldev_util.h"
+#include "utility.h"
 
 GLuint g_vbo;
 GLuint g_scale_location;
-
-const char* kVSFileName = "shader.vs";
-const char* kFSFileName = "shader.fs";
 
 static void RenderSceneCB() {
   glClear(GL_COLOR_BUFFER_BIT);
@@ -52,85 +49,6 @@ static void CreateVertexBuffer() {
   glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
 }
 
-static void AddShader(GLuint shader_program, const char* shader_text,
-                      GLenum shader_type) {
-  GLuint shader_object = glCreateShader(shader_type);
-
-  if (shader_object == 0) {
-    fprintf(stderr, "Error creating shader type %d\n", shader_type);
-    exit(1);
-  }
-
-  const GLchar* texts[1] = {shader_text};
-  GLint lengths[1] = {(GLint)std::strlen(shader_text)};
-  glShaderSource(shader_object, 1, texts, lengths);
-
-  glCompileShader(shader_object);
-
-  GLint status = GL_FALSE;
-  glGetShaderiv(shader_object, GL_COMPILE_STATUS, &status);
-  if (status != GL_TRUE) {
-    GLchar info_log[1024];
-    glGetShaderInfoLog(shader_object, 1024, NULL, info_log);
-    fprintf(stderr, "Error compiling shader type %d: '%s'\n", shader_type,
-            info_log);
-    exit(1);
-  }
-
-  glAttachShader(shader_program, shader_object);
-}
-
-static void CompileShaders() {
-  GLuint shader_program = glCreateProgram();
-
-  if (shader_program == 0) {
-    fprintf(stderr, "Error creating shader program\n");
-    exit(1);
-  }
-
-  std::string vs;
-  std::string fs;
-
-  if (!ReadFile(kVSFileName, vs)) {
-    exit(1);
-  }
-
-  if (!ReadFile(kFSFileName, fs)) {
-    exit(1);
-  }
-
-  AddShader(shader_program, vs.c_str(), GL_VERTEX_SHADER);
-  AddShader(shader_program, fs.c_str(), GL_FRAGMENT_SHADER);
-
-  GLint status = 0;
-  GLchar error_log[1024] = {0};
-
-  glLinkProgram(shader_program);
-
-  glGetProgramiv(shader_program, GL_LINK_STATUS, &status);
-  if (status != GL_TRUE) {
-    glGetProgramInfoLog(shader_program, sizeof(error_log), NULL, error_log);
-    fprintf(stderr, "Error linking shader program: '%s'\n", error_log);
-    exit(1);
-  }
-
-  glValidateProgram(shader_program);
-
-  glGetProgramiv(shader_program, GL_VALIDATE_STATUS, &status);
-  if (status != GL_TRUE) {
-    glGetProgramInfoLog(shader_program, sizeof(error_log), NULL, error_log);
-    fprintf(stderr, "Invalid shader program: '%s'\n", error_log);
-    exit(1);
-  }
-
-  glUseProgram(shader_program);
-
-  // 拿到一致变量的位置（且只有在链接之后才能拿到这个位置），随后便可通过
-  // glUniform 设置一致变量的值，或通过 glGetUniform 得到它的值。
-  g_scale_location = glGetUniformLocation(shader_program, "gScale");
-  assert(g_scale_location != 0xFFFFFFFF);
-}
-
 int main(int argc, char** argv) {
   glutInitContextVersion(4, 5);
   glutInitContextProfile(GLUT_CORE_PROFILE);
@@ -155,13 +73,19 @@ int main(int argc, char** argv) {
 
   glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
 
+  // 关于 VAO，详见 04_shaders 示例里的注释。
   GLuint vao;
   glGenVertexArrays(1, &vao);
   glBindVertexArray(vao);
 
   CreateVertexBuffer();
 
-  CompileShaders();
+  GLuint shader_program = CreateProgram("shader.vs", "shader.fs");
+
+  // 拿到一致变量的位置（且只有在链接之后才能拿到这个位置），随后便可通过
+  // glUniform 设置一致变量的值，或通过 glGetUniform 得到它的值。
+  g_scale_location = glGetUniformLocation(shader_program, "gScale");
+  assert(g_scale_location != 0xFFFFFFFF);
 
   glutMainLoop();
 

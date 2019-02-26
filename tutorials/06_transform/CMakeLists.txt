@@ -1,5 +1,11 @@
-add_executable(06_transform 06_transform.cpp)
-target_link_libraries(06_transform ${LIBS})
+set(TARGET_NAME 06_transform)
 
-install(FILES shader.fs DESTINATION ./06_transform)
-install(FILES shader.vs DESTINATION ./06_transform)
+add_executable(${TARGET_NAME}
+    06_transform.cpp
+    ../utility.cpp
+    ../utility.h)
+
+target_link_libraries(${TARGET_NAME} ${LIBS})
+
+install(FILES shader.fs DESTINATION ./${TARGET_NAME})
+install(FILES shader.vs DESTINATION ./${TARGET_NAME})
